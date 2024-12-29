@@ -25,8 +25,7 @@ interface Path {
 
 function App() {
   let [hasUploaded, setHasUploaded] = useState<Boolean>(false);
-  // let [pdfPath, setPdfPath] = useState<string>('/test.pdf');
-  let pdfPath = useRef<string>('/test.pdf');
+  let [pdfPath, setPdfPath] = useState<File>();
   let [paths, setPaths] = useState<Array<Path>>([]);
 
   const Viewer: React.FC<Viewer> = ({hasUploaded})=> <>
@@ -35,7 +34,7 @@ function App() {
   </>
   return (
     <div className='App'>
-      {!hasUploaded && <Upload hasUploaded={setHasUploaded} pdfPath={pdfPath} paths={paths} setPaths={setPaths}/>}
+      {!hasUploaded && <Upload hasUploaded={setHasUploaded} setFilePath={setPdfPath} paths={paths} setPaths={setPaths}/>}
       {hasUploaded && <Viewer hasUploaded={setHasUploaded}/>}
     </div>
   );

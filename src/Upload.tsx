@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 interface UploadProps{
 	hasUploaded: React.Dispatch<React.SetStateAction<Boolean>>;
-	// setFilePath: React.Dispatch<React.SetStateAction<string>>;
-	pdfPath: React.MutableRefObject<string>;
+	setFilePath: React.Dispatch<React.SetStateAction<File|undefined>>;
+	// pdfPath: File;
 	paths:Array<Path>;
 	setPaths: React.Dispatch<React.SetStateAction<Array<Path>>>;
 };
@@ -12,7 +12,7 @@ interface Path {
   name: string;
 };
 
-const Upload: React.FC<UploadProps> = ({hasUploaded, pdfPath, paths, setPaths})=> {
+const Upload: React.FC<UploadProps> = ({hasUploaded, setFilePath, paths, setPaths})=> {
 	const [selectedFile, setSelectedFile] = useState<File|null>(null);
 	// let [paths, setPaths] = useState<Array<Path>>([]);
 	// Handle file selection
@@ -31,11 +31,10 @@ const Upload: React.FC<UploadProps> = ({hasUploaded, pdfPath, paths, setPaths})=
 		// Example: Log the file details
 		console.log('Uploading file:', selectedFile);
 		let path = URL.createObjectURL(selectedFile);
+		setFilePath(selectedFile);
 		paths = [...paths, {name: selectedFile.name, url: path}];
 		console.log(paths);
 		setPaths(paths);
-		// setFilePath(path);
-		pdfPath.current = path;
 		console.log(path);
 		hasUploaded(true);
 	}

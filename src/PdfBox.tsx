@@ -18,7 +18,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 let URLGPT = "https://smartbooks-sfgp.onrender.com";
 interface PdfBoxProps {
   // pdfPath: string;
-  pdfPath: React.MutableRefObject<string>;
+  pdfPath: File|undefined;
 }
 
 const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
@@ -105,7 +105,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   // }, [pdfDocument]);
   return (
     <div>
-      <Document className="mainView" file={pdfPath.current} onLoadSuccess={onDocumentLoadSuccess}>
+      <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
         <Page pageNumber={pageNumber} />
         <p style={{margin: 0}}>
           Page 
