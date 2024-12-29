@@ -1,0 +1,12 @@
+.summaryBox {
+	/* display: inline-block; */
+	/* align-self: center; */
+	padding: 10px;
+	margin: 0 auto;
+	border: 5px solid #000;
+	border-radius: 20px;
+	background-color: beige;
+	height: 500px;
+	width: 500px;
+	overflow-y: scroll;
+}
