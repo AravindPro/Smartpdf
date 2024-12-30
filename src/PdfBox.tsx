@@ -1,19 +1,21 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { Document, Page } from 'react-pdf';
+import { Document, Page, pdfjs } from 'react-pdf';
 import axios from 'axios';
-import { pdfjs } from 'react-pdf';
 import { PDFDocumentProxy } from 'pdfjs-dist';
+// import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import './PdfBox.css';
 import ReactMarkdown from 'react-markdown';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+// pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+//     'pdfjs-dist/build/pdf.worker.min.mjs',
+//     import.meta.url,
+//   ).toString();
+const pdfjsWorker = require('pdfjs-dist/build/pdf.worker.min.mjs');
+// pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+// pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.js';
 
 let URLGPT = "https://smartbooks-sfgp.onrender.com";
 interface PdfBoxProps {
@@ -61,6 +63,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
     },
     [] // No dependencies
   );
+
 
 
   // function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
