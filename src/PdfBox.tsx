@@ -17,6 +17,7 @@ const pdfjsWorker = require('pdfjs-dist/build/pdf.worker.min.mjs');
 
 // pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.js';
 
+// let URLGPT = "https://localhost:8000";
 let URLGPT = "https://smartbooks-sfgp.onrender.com";
 interface PdfBoxProps {
   // pdfPath: string;
@@ -90,10 +91,12 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 			const textContent = await page.getTextContent();
 			const textItems = textContent.items;
 			for(let i of textItems){
-			if("str" in i)
-				text += i.str ;
-			}
+        if("str" in i)
+          text += i.str + " " ;
+      }
+      text += " ";
 		}
+    console.log(text);
 		getSummary(text);
       } catch (error) {
         console.error("Error extracting text from page:", error);
@@ -126,6 +129,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
             if(pageNumber < numPages)
               setPageNumber(pageNumber+1);			
             }}>Next</button>
+          <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
           <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} />
         </div>
       </Document>
