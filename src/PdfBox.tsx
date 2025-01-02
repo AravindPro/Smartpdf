@@ -7,6 +7,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import './PdfBox.css';
 import ReactMarkdown from 'react-markdown';
+import { useSwipeable } from "react-swipeable";
 
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 //     'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -30,6 +31,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   const [extraPages, setExtraPages] = useState<number>(10);
   let [compressionratio, setCompressionratio] = useState<Number>(2);
   let [summary, setSummary] = useState<string>("");
+  
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight") {
@@ -48,12 +50,28 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 
     // Attach the event listener
     window.addEventListener("keydown", handleKey);
-
     // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener("keydown", handleKey);
-    };
+    };    
   }, [numPages, pageNumber]);
+
+  const nextPage = ()=>{
+    if(pageNumber < numPages) setPageNumber(pageNumber+1);
+  };
+  const prevPage = ()=>{
+    if(pageNumber>1) setPageNumber(pageNumber-1);
+  };
+
+  // Add swipe handlers
+  const handlers = useSwipeable({
+    onSwipedLeft: nextPage,
+    onSwipedRight: prevPage,
+    onSwipedUp: () => console.log("Swiped up!"),
+    onSwipedDown: () => console.log("Swiped down!"),
+  });
+
+
   let pdfDocumentRef = useRef<PDFDocumentProxy>();
 
   const onDocumentLoadSuccess = useCallback(
@@ -110,7 +128,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   //   }
   // }, [pdfDocument]);
   return (
-    <div>
+    <div {...handlers} id="pdfbox">
       <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
         <Page pageNumber={pageNumber} />
         <p style={{margin: 0}}>
@@ -119,16 +137,9 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 		   of {numPages}
         </p>
         <div className="buttons">
-          <button onClick={(e)=>{
-              if(pageNumber>1)
-                setPageNumber(pageNumber-1);
-            }
-          }>Prev</button>
+          <button onClick={prevPage}>Prev</button>
           <button onClick={getTextFromPage}>Summary</button>
-          <button onClick={(e)=>{
-            if(pageNumber < numPages)
-              setPageNumber(pageNumber+1);			
-            }}>Next</button>
+          <button onClick={nextPage}>Next</button>
           <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
           <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} />
         </div>
