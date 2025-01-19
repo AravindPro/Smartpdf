@@ -19,6 +19,7 @@
     "@types/react-dom": "^18.0.0",
     "@wojtekmaj/react-hooks": "^1.21.0",
     "axios": "^1.7.9",
+    "katex": "^0.16.19",
     "nvm": "^0.0.4",
     "pdfjs-dist": "4.8.69",
     "react": "^19.0.0",
@@ -28,6 +29,8 @@
     "react-router-dom": "^7.1.1",
     "react-scripts": "5.0.1",
     "react-swipeable": "^7.0.2",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.0",
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },

@@ -8,7 +8,9 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import './PdfBox.css';
 import ReactMarkdown from 'react-markdown';
 import { useSwipeable } from "react-swipeable";
-
+import remarkGfm from "remark-gfm";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 //     'pdfjs-dist/build/pdf.worker.min.mjs',
 //     import.meta.url,
@@ -29,8 +31,10 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   const [numPages, setNumPages] = useState<number>(1);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [extraPages, setExtraPages] = useState<number>(10);
+  const targetRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   let [compressionratio, setCompressionratio] = useState<Number>(2);
   let [summary, setSummary] = useState<string>("");
+  let [loading, setLoading] = useState(false);
   
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -89,15 +93,23 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   //   setNumPages(numPages);
   // }
   const getSummary = (text: String): void=>{
-	axios.post(`${URLGPT}/getsummary`, null, { params: {text: text, COMPRESSIONRATIO: compressionratio, styletokens: "simple language and output" }})
-		.then((res)=>res.data)
-		.then((data)=>{
-			console.log(data);
-			if(!("error" in data)){
-				setSummary(data['summary']);
-			}
-		})
-		.catch((e)=>console.log(e));
+    setLoading(true);
+    axios.post(`${URLGPT}/getsummary`, null, { params: {text: text, COMPRESSIONRATIO: compressionratio, styletokens: "simple language and output" }})
+      .then((res)=>res.data)
+      .then((data)=>{
+        setLoading(false);
+        console.log(data);
+        if(!("error" in data)){
+          setSummary(data['summary']);
+          if(targetRef.current){
+            targetRef.current.scrollIntoView();
+          }
+        }
+      })
+      .catch((e)=>{
+        setLoading(false);
+        console.log(e)
+      });
   }
   const getTextFromPage = async () => {
     const pdfDocument = pdfDocumentRef.current;
@@ -144,8 +156,11 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
           <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} />
         </div>
       </Document>
-      <div className="summaryBox">
-        <ReactMarkdown>{summary}</ReactMarkdown>
+      <div ref={targetRef} className="summaryBox">
+        {loading && <div className="loading-overlay">
+					<div className="spinner"></div>
+				</div>}
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeKatex]}>{summary}</ReactMarkdown>
       </div>
     </div>
   );
