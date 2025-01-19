@@ -35,6 +35,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   let [compressionratio, setCompressionratio] = useState<Number>(2);
   let [summary, setSummary] = useState<string>("");
   let [loading, setLoading] = useState(false);
+  let [settings, setSettings] = useState<Boolean>(false);
   
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -141,6 +142,23 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   // }, [pdfDocument]);
   return (
     <div {...handlers} id="pdfbox">
+
+      {settings && <div className="settings-panel" id="settingsPanel">
+        <button className="close-button" id="closePanel" onClick={()=>setSettings(false)}>&times;</button>
+        <h2>Settings</h2>
+        <div className="setting">
+          <label>
+            Compression Ratio:
+            <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> 
+          </label>
+        </div>
+        <div className="setting">
+          <label>
+            Number of Pages: 
+            <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
+          </label>
+        </div>
+      </div>}
       <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
         <Page pageNumber={pageNumber} />
         <p style={{margin: 0}}>
@@ -149,11 +167,12 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 		   of {numPages}
         </p>
         <div className="buttons">
+          <button onClick={()=>setSettings(!settings)}>Settings</button>
           <button onClick={prevPage}>Prev</button>
           <button onClick={getTextFromPage}>Summary</button>
           <button onClick={nextPage}>Next</button>
-          <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
-          <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} />
+          {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
+          <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}
         </div>
       </Document>
       <div ref={targetRef} className="summaryBox">
