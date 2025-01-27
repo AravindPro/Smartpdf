@@ -36,6 +36,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   let [summary, setSummary] = useState<string>("");
   let [loading, setLoading] = useState(false);
   let [settings, setSettings] = useState<Boolean>(false);
+  let [scale, setScale] = useState<number>(1);
   
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -162,7 +163,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
         </div>
       </div>}
       <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
-        <Page pageNumber={pageNumber} />
+        <Page pageNumber={pageNumber} scale={scale}/>
         <p style={{margin: 0}}>
           Page 
 		  {/* <input type="text" id="pageno_inp" defaultValue={1} onBlur={(e)=>setPageNumber(Number(e.target.value))} /> */}
@@ -170,9 +171,11 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 		   of {numPages}
         </p>
         <div className="buttons">
+          <button onClick={()=>setScale(Math.max(scale-1, 1))}>-</button>
           <button onClick={()=>setSettings(!settings)}>Settings</button>
           {/* <button onClick={prevPage}>Prev</button> */}
           <button onClick={getTextFromPage}>Summary</button>
+          <button onClick={()=>setScale(Math.max(scale+1, 1))}>+</button>
           {/* <button onClick={nextPage}>Next</button> */}
           {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
           <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}
