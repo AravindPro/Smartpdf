@@ -149,14 +149,14 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
         <div className="setting">
           <label>
             Compression Ratio:
-            <input type="text" onBlur={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
+            <input type="text" defaultValue={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
             {/* <input type="text" value={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value)); console.log(e.target.value)}} />  */}
           </label>
         </div>
         <div className="setting">
           <label>
             Number of Pages: 
-            <input type="text" onBlur={(e)=>setExtraPages(Number(e.target.value))} />
+            <input type="text" defaultValue={String(extraPages)} onBlur={(e)=>setExtraPages(Number(e.target.value))} />
             {/* <input type="text" value={String(extraPages)} onBlur={(e)=>setExtraPages(Number(e.target.value))} /> */}
           </label>
         </div>
@@ -166,7 +166,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
         <p style={{margin: 0}}>
           Page 
 		  {/* <input type="text" id="pageno_inp" defaultValue={1} onBlur={(e)=>setPageNumber(Number(e.target.value))} /> */}
-		  <input type="text" id="pageno_inp" value={pageNumber} onBlur={(e)=>setPageNumber(Number(e.target.value))} />
+		  <input type="text" id="pageno_inp" defaultValue={pageNumber} onBlur={(e)=>setPageNumber(Number(e.target.value))} />
 		   of {numPages}
         </p>
         <div className="buttons">
