@@ -44,7 +44,7 @@ const Upload: React.FC<UploadProps> = ({hasUploaded, setFilePath, paths, setPath
 	return (
 		<div>
 			<h2>File Upload</h2>
-			<input type="file" onChange={handleFileChange} />
+			<input type="file" accept="application/pdf" onChange={handleFileChange} />
 			<button onClick={handleFileUpload}>Upload</button>
 			{selectedFile && <p>Selected File: {selectedFile.name}</p>}
 

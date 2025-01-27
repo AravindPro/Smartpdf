@@ -23,6 +23,7 @@ interface Path {
   name: string;
 };
 
+
 function App() {
   let [hasUploaded, setHasUploaded] = useState<Boolean>(false);
   let [pdfPath, setPdfPath] = useState<File>();
