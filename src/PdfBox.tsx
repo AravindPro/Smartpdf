@@ -30,6 +30,7 @@ interface PdfBoxProps {
 const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   const [numPages, setNumPages] = useState<number>(1);
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [pageNumberDisp, setPageNumberDisp] = useState<number>(1);
   const [extraPages, setExtraPages] = useState<number>(10);
   const targetRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   let [compressionratio, setCompressionratio] = useState<Number>(2);
@@ -41,16 +42,10 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight") {
-        console.log(pageNumber, numPages);
-        if(pageNumber < numPages){
-          console.log("geiw");
-          setPageNumber(pageNumber+1);	
-        }
+        nextPage();
       }
       else if(event.key === "ArrowLeft"){
-        console.log("leftgeiw");
-        if(pageNumber > 1)
-          setPageNumber(pageNumber-1);	
+        prevPage();
       }
     };
 
@@ -63,10 +58,16 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   }, [numPages, pageNumber]);
 
   const nextPage = ()=>{
-    if(pageNumber < numPages) setPageNumber(pageNumber+1);
+    if(pageNumber < numPages){
+      setPageNumberDisp(pageNumber+1);	
+      setPageNumber(pageNumber+1);	
+    }
   };
   const prevPage = ()=>{
-    if(pageNumber>1) setPageNumber(pageNumber-1);
+    if(pageNumber > 1){
+      setPageNumberDisp(pageNumber-1);	
+      setPageNumber(pageNumber-1);	
+    }
   };
 
   // Add swipe handlers
@@ -167,7 +168,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
         <p style={{margin: 0}}>
           Page 
 		  {/* <input type="text" id="pageno_inp" defaultValue={1} onBlur={(e)=>setPageNumber(Number(e.target.value))} /> */}
-		  <input type="text" id="pageno_inp" defaultValue={pageNumber} onBlur={(e)=>setPageNumber(Number(e.target.value))} />
+		  <input type="text" id="pageno_inp" value={pageNumberDisp} onChange={(e)=>setPageNumberDisp(Number(e.target.value))} onBlur={()=>setPageNumber(pageNumberDisp)} />
 		   of {numPages}
         </p>
         <div className="buttons">
