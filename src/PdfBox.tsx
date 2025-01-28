@@ -31,7 +31,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   const [numPages, setNumPages] = useState<number>(1);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [pageNumberDisp, setPageNumberDisp] = useState<number>(1);
-  const [extraPages, setExtraPages] = useState<number>(10);
+  const [extraPages, setExtraPages] = useState<number>(5);
   const targetRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   let [compressionratio, setCompressionratio] = useState<Number>(2);
   let [summary, setSummary] = useState<string>("");
@@ -145,24 +145,25 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   return (
     <div {...handlers} id="pdfbox">
 
-      {settings && <div className="settings-panel" id="settingsPanel">
+      {/* {settings && <div className="settings-panel" id="settingsPanel">
         <button className="close-button" id="closePanel" onClick={()=>setSettings(false)}>&times;</button>
         <h2>Settings</h2>
         <div className="setting">
           <label>
             Compression Ratio:
-            <input type="text" defaultValue={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
+            <input type="range" min={1} max={10} defaultValue={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value))}} />  */}
+            {/* <textarea>{String(compressionratio)}</textarea> */}
             {/* <input type="text" value={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value)); console.log(e.target.value)}} />  */}
-          </label>
+          {/* </label>
         </div>
         <div className="setting">
           <label>
             Number of Pages: 
             <input type="text" defaultValue={String(extraPages)} onBlur={(e)=>setExtraPages(Number(e.target.value))} />
             {/* <input type="text" value={String(extraPages)} onBlur={(e)=>setExtraPages(Number(e.target.value))} /> */}
-          </label>
+          {/* </label>
         </div>
-      </div>}
+      </div>} */} 
       <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
         <Page pageNumber={pageNumber} scale={scale}/>
         <p style={{margin: 0}}>
@@ -172,14 +173,27 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 		   of {numPages}
         </p>
         <div className="buttons">
-          <button onClick={()=>setScale(Math.max(scale-1, 1))}>-</button>
-          <button onClick={()=>setSettings(!settings)}>Settings</button>
+          <button onClick={()=>setScale(Math.max(scale-0.5, 1))}>-</button>
+          {/* <button onClick={()=>setSettings(!settings)}>Settings</button> */}
           {/* <button onClick={prevPage}>Prev</button> */}
           <button onClick={getTextFromPage}>Summary</button>
-          <button onClick={()=>setScale(Math.max(scale+1, 1))}>+</button>
+          <button onClick={()=>setScale(Math.max(scale+0.5, 1))}>+</button>
           {/* <button onClick={nextPage}>Next</button> */}
           {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
           <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}
+        </div>
+        <div className="sliders">
+          <label className="itemslide">
+            Compression Ratio: 
+            <input type="range" min={1} max={10} defaultValue={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
+            <span className='range_disp'>{String(compressionratio)}</span>
+          </label>
+          <label className="itemslide">
+            Number of pages: 
+            <input type="range" min={1} max={10} defaultValue={String(extraPages)} onBlur={(e)=>{setExtraPages(Number(e.target.value))}} /> 
+            <span className='range_disp'>{String(extraPages)}</span>
+          </label>
+
         </div>
       </Document>
       <div ref={targetRef} className="summaryBox">

@@ -172,3 +172,18 @@
 .settings-panel .setting {
   margin-bottom: 15px;
 }
+
+.sliders{
+  display: flex;
+  flex-direction: column;
+}
+.itemslide{
+  margin: 2px;
+}
+.range_disp{
+  display: inline-block;
+  border:2px solid #000;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+}
