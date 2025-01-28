@@ -185,12 +185,12 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
         <div className="sliders">
           <label className="itemslide">
             Compression Ratio: 
-            <input type="range" min={1} max={10} defaultValue={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
+            <input type="range" min={1} max={10} step={0.1} value={String(compressionratio)} onChange={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
             <span className='range_disp'>{String(compressionratio)}</span>
           </label>
           <label className="itemslide">
             Number of pages: 
-            <input type="range" min={1} max={10} defaultValue={String(extraPages)} onBlur={(e)=>{setExtraPages(Number(e.target.value))}} /> 
+            <input type="range" min={1} max={10} value={String(extraPages)} onChange={(e)=>{setExtraPages(Number(e.target.value))}} /> 
             <span className='range_disp'>{String(extraPages)}</span>
           </label>
 
