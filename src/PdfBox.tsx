@@ -38,6 +38,33 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   let [loading, setLoading] = useState(false);
   let [settings, setSettings] = useState<Boolean>(false);
   let [scale, setScale] = useState<number>(1);
+  let [isSel, setIsSel] = useState<boolean>(false);
+  let [selText, setSelectedText] = useState<string>('');
+  const divRef = useRef(null);
+
+  const handleSelection = ()=>{
+      const selection = document.getSelection()?.toString();
+      // console.log("Here");
+      if(selection && selection.length > 0){
+        setIsSel(true);
+        setSelectedText(selection);
+        console.log(selection);
+      }
+      else
+        setIsSel(false);
+    }
+  // useEffect(()=>{
+
+  //   window.addEventListener('selectionchange', handleSelection);
+  //   window.addEventListener('onmouseup', handleSelection);
+
+  //   return () => {
+
+  //     window.removeEventListener('selectionchange', handleSelection);
+  //     window.removeEventListener('onmouseup', handleSelection);
+  //   };
+  // }, []);
+
   
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -114,74 +141,64 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
         console.log(e)
       });
   }
-  const getTextFromPage = async () => {
-    const pdfDocument = pdfDocumentRef.current;
-	let text: string = "";
-    if (pdfDocument) {
-      try {
-		for(let extra=0; (extra<extraPages && pageNumber+extra <= numPages); extra++){
-			const page = await pdfDocument.getPage(pageNumber+extra);
-			const textContent = await page.getTextContent();
-			const textItems = textContent.items;
-			for(let i of textItems){
-        if("str" in i)
-          text += i.str + " " ;
-      }
-      text += " ";
-		}
-    console.log(text);
-		getSummary(text);
-      } catch (error) {
-        console.error("Error extracting text from page:", error);
+
+  const summarizeFunc = async () => {
+    let text: string = "";
+    if(isSel){
+      text = selText;
+    }
+    else{
+      const pdfDocument = pdfDocumentRef.current;
+      if (pdfDocument) {
+        try{
+          for(let extra=0; (extra<extraPages && pageNumber+extra <= numPages); extra++){
+            const page = await pdfDocument.getPage(pageNumber+extra);
+            const textContent = await page.getTextContent();
+            const textItems = textContent.items;
+            for(let i of textItems){
+              if("str" in i)
+                text += i.str + " " ;
+            }
+            text += " ";
+          }
+        }
+        catch (error){
+          console.error("Error extracting text from page:", error);
+        }
       }
     }
+    console.log(text);
+    getSummary(text);
   };
   // useEffect(() => {
   //   if (pdfDocument) {
   //     // Example: Extract text from the first page
-  //     getTextFromPage(1);
+  //     summarizeFunc(1);
   //   }
   // }, [pdfDocument]);
   return (
     <div {...handlers} id="pdfbox">
-
-      {/* {settings && <div className="settings-panel" id="settingsPanel">
-        <button className="close-button" id="closePanel" onClick={()=>setSettings(false)}>&times;</button>
-        <h2>Settings</h2>
-        <div className="setting">
-          <label>
-            Compression Ratio:
-            <input type="range" min={1} max={10} defaultValue={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value))}} />  */}
-            {/* <textarea>{String(compressionratio)}</textarea> */}
-            {/* <input type="text" value={String(compressionratio)} onBlur={(e)=>{setCompressionratio(Number(e.target.value)); console.log(e.target.value)}} />  */}
-          {/* </label>
+      
+      <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
+        <div ref={divRef}>
+          <Page pageNumber={pageNumber} scale={scale} />
         </div>
-        <div className="setting">
-          <label>
-            Number of Pages: 
-            <input type="text" defaultValue={String(extraPages)} onBlur={(e)=>setExtraPages(Number(e.target.value))} />
-            {/* <input type="text" value={String(extraPages)} onBlur={(e)=>setExtraPages(Number(e.target.value))} /> */}
-          {/* </label>
-        </div>
-      </div>} */} 
-      <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
-        <Page pageNumber={pageNumber} scale={scale}/>
         <p style={{margin: 0}}>
           Page 
-		  {/* <input type="text" id="pageno_inp" defaultValue={1} onBlur={(e)=>setPageNumber(Number(e.target.value))} /> */}
-		  <input type="text" id="pageno_inp" value={pageNumberDisp} onChange={(e)=>setPageNumberDisp(Number(e.target.value))} onBlur={()=>setPageNumber(pageNumberDisp)} />
-		   of {numPages}
+          <input type="text" id="pageno_inp" value={pageNumberDisp} onChange={(e)=>setPageNumberDisp(Number(e.target.value))} onBlur={()=>setPageNumber(pageNumberDisp)} />
+          of {numPages}
         </p>
         <div className="buttons">
           <button onClick={()=>setScale(Math.max(scale-0.5, 1))}>-</button>
           {/* <button onClick={()=>setSettings(!settings)}>Settings</button> */}
           {/* <button onClick={prevPage}>Prev</button> */}
-          <button onClick={getTextFromPage}>Summary</button>
+          <button onClick={summarizeFunc}>{isSel?'Summary Selection':'Summary'}</button>
           <button onClick={()=>setScale(Math.max(scale+0.5, 1))}>+</button>
           {/* <button onClick={nextPage}>Next</button> */}
           {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
           <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}
         </div>
+
         <div className="sliders">
           <label className="itemslide">
             Compression Ratio: 
@@ -196,6 +213,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 
         </div>
       </Document>
+
       <div ref={targetRef} className="summaryBox">
         {loading && <div className="loading-overlay">
 					<div className="spinner"></div>
