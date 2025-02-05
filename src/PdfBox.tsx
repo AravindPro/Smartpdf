@@ -36,7 +36,8 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   let [compressionratio, setCompressionratio] = useState<Number>(2);
   let [summary, setSummary] = useState<string>("");
   let [loading, setLoading] = useState(false);
-  let [settings, setSettings] = useState<Boolean>(false);
+  // let [settings, setSettings] = useState<Boolean>(false);
+  let [styletokens,setStyleTokens] = useState("simple language");
   let [scale, setScale] = useState<number>(1);
   let [isSel, setIsSel] = useState<boolean>(false);
   let [selText, setSelectedText] = useState<string>('');
@@ -124,7 +125,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   // }
   const getSummary = (text: String): void=>{
     setLoading(true);
-    axios.post(`${URLGPT}/getsummary`, null, { params: {text: text, COMPRESSIONRATIO: compressionratio, styletokens: "simple language and output" }})
+    axios.post(`${URLGPT}/getsummary`, null, { params: {text: text, COMPRESSIONRATIO: compressionratio, styletokens: styletokens }})
       .then((res)=>res.data)
       .then((data)=>{
         setLoading(false);
@@ -209,6 +210,10 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
             Number of pages: 
             <input type="range" min={1} max={10} value={String(extraPages)} onChange={(e)=>{setExtraPages(Number(e.target.value))}} /> 
             <span className='range_disp'>{String(extraPages)}</span>
+          </label>
+          <label>
+            Style-Tokens:
+            <input type="text" value={styletokens} onChange={(e)=>setStyleTokens(e.target.value)}/>
           </label>
 
         </div>
