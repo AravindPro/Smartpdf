@@ -9,6 +9,7 @@ import './PdfBox.css';
 import ReactMarkdown from 'react-markdown';
 import { useSwipeable } from "react-swipeable";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -223,7 +224,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
         {loading && <div className="loading-overlay">
 					<div className="spinner"></div>
 				</div>}
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeKatex]}>{summary}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{summary}</ReactMarkdown>
       </div>
     </div>
   );
