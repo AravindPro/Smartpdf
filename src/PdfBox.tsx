@@ -29,6 +29,7 @@ interface PdfBoxProps {
 }
 
 const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
+  let [invert, setInvert] = useState<number>(0);
   const [numPages, setNumPages] = useState<number>(1);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [pageNumberDisp, setPageNumberDisp] = useState<number>(1);
@@ -179,10 +180,10 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   //   }
   // }, [pdfDocument]);
   return (
-    <div {...handlers} id="pdfbox">
+    <div {...handlers} id="pdfbox" >
       
       <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
-        <div ref={divRef}>
+        <div ref={divRef} style={{filter: `invert(${invert})`}}>
           <Page pageNumber={pageNumber} scale={scale} />
         </div>
         <p style={{margin: 0}}>
@@ -196,6 +197,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
           {/* <button onClick={prevPage}>Prev</button> */}
           <button onClick={summarizeFunc}>{isSel?'Summary Selection':'Summary'}</button>
           <button onClick={()=>setScale(Math.max(scale+0.5, 1))}>+</button>
+          <button onClick={()=>setInvert(invert?0:1)}>Invert</button>
           {/* <button onClick={nextPage}>Next</button> */}
           {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
           <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}

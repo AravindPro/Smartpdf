@@ -25,6 +25,7 @@ interface Path {
 
 
 function App() {
+  let [invert, setInvert] = useState(0);
   let [hasUploaded, setHasUploaded] = useState<Boolean>(false);
   let [pdfPath, setPdfPath] = useState<File>();
   let [paths, setPaths] = useState<Array<Path>>([]);
