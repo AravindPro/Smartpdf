@@ -180,47 +180,48 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   //   }
   // }, [pdfDocument]);
   return (
-    <div {...handlers} id="pdfbox" >
-      
-      <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
-        <div ref={divRef} style={{filter: `invert(${invert})`}}>
-          <Page pageNumber={pageNumber} scale={scale} />
-        </div>
-        <p style={{margin: 0}}>
-          Page 
-          <input type="text" id="pageno_inp" value={pageNumberDisp} onChange={(e)=>setPageNumberDisp(Number(e.target.value))} onBlur={()=>setPageNumber(pageNumberDisp)} />
-          of {numPages}
-        </p>
-        <div className="buttons">
-          <button onClick={()=>setScale(Math.max(scale-0.5, 1))}>-</button>
-          {/* <button onClick={()=>setSettings(!settings)}>Settings</button> */}
-          {/* <button onClick={prevPage}>Prev</button> */}
-          <button onClick={summarizeFunc}>{isSel?'Summary Selection':'Summary'}</button>
-          <button onClick={()=>setScale(Math.max(scale+0.5, 1))}>+</button>
-          <button onClick={()=>setInvert(invert?0:1)}>Invert</button>
-          {/* <button onClick={nextPage}>Next</button> */}
-          {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
-          <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}
-        </div>
+    <div id="pdfbox" >
+      <div {...handlers}>
+        <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
+          <div ref={divRef} style={{filter: `invert(${invert})`}}>
+            <Page pageNumber={pageNumber} scale={scale} />
+          </div>
+          <p style={{margin: 0}}>
+            Page 
+            <input type="text" id="pageno_inp" value={pageNumberDisp} onChange={(e)=>setPageNumberDisp(Number(e.target.value))} onBlur={()=>setPageNumber(pageNumberDisp)} />
+            of {numPages}
+          </p>
+          <div className="buttons">
+            <button onClick={()=>setScale(Math.max(scale-0.5, 1))}>-</button>
+            {/* <button onClick={()=>setSettings(!settings)}>Settings</button> */}
+            {/* <button onClick={prevPage}>Prev</button> */}
+            <button onClick={summarizeFunc}>{isSel?'Summary Selection':'Summary'}</button>
+            <button onClick={()=>setScale(Math.max(scale+0.5, 1))}>+</button>
+            <button onClick={()=>setInvert(invert?0:1)}>Invert</button>
+            {/* <button onClick={nextPage}>Next</button> */}
+            {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
+            <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}
+          </div>
 
-        <div className="sliders">
-          <label className="itemslide">
-            Compression Ratio: 
-            <input type="range" min={1} max={10} step={0.1} value={String(compressionratio)} onChange={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
-            <span className='range_disp'>{String(compressionratio)}</span>
-          </label>
-          <label className="itemslide">
-            Number of pages: 
-            <input type="range" min={1} max={10} value={String(extraPages)} onChange={(e)=>{setExtraPages(Number(e.target.value))}} /> 
-            <span className='range_disp'>{String(extraPages)}</span>
-          </label>
-          <label>
-            Style-Tokens:
-            <input type="text" value={styletokens} onChange={(e)=>setStyleTokens(e.target.value)}/>
-          </label>
+          <div className="sliders">
+            <label className="itemslide">
+              Compression Ratio: 
+              <input type="range" min={1} max={10} step={0.1} value={String(compressionratio)} onChange={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
+              <span className='range_disp'>{String(compressionratio)}</span>
+            </label>
+            <label className="itemslide">
+              Number of pages: 
+              <input type="range" min={1} max={10} value={String(extraPages)} onChange={(e)=>{setExtraPages(Number(e.target.value))}} /> 
+              <span className='range_disp'>{String(extraPages)}</span>
+            </label>
+            <label>
+              Style-Tokens:
+              <input type="text" value={styletokens} onChange={(e)=>setStyleTokens(e.target.value)}/>
+            </label>
 
-        </div>
-      </Document>
+          </div>
+        </Document>
+      </div>
 
       <div ref={targetRef} className="summaryBox">
         {loading && <div className="loading-overlay">
