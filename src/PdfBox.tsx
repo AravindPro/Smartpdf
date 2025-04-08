@@ -214,39 +214,41 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 					<button onClick={()=>{setShow(false)}} className="absolute top-0.5 right-1.5 w-4 h-4 text-gray-500 hover:text-red-500 text-xl font-bold">
 						&times;
 					</button>
-					<div className="text-justify overflow-y-scroll p-4 h-[94%]">
-            {questionList.map((e)=>
-                <>
-                  <p className="border-t border-b border-white p-4 text-2xl">{e['question']} </p>
-                  <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{e.answer}</ReactMarkdown>
-                </>
-            )
-            }
-            {loading && <div className="flex items-center justify-center h-32">
-              <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-white"></div>
-            </div>}
-					</div>
-          <div className="flex items-center space-x-2 w-full mt-2 mx-2">
-            <button  onClick={()=>{questionList=[]; setQuestionList(questionList)}} className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              <ArrowPathIcon className="w-5 h-5" />
-            </button>
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={question}
-              onChange={(e)=>setQuestion(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault(); // Prevent newline if textarea
-                  getAnswerFunc(question);
-                  setQuestion('');
-                }
-              }}
-              className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button onClick={()=>{getAnswerFunc(question); setQuestion('')}} className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              <PaperAirplaneIcon className="w-5 h-5" />
-            </button>
+          <div className='flex flex-col h-[90vh]'>
+            <div className="flex-grow text-justify overflow-y-scroll p-4 h-full">
+              {questionList.map((e)=>
+                  <>
+                    <p className="border-t border-b border-white p-4 text-2xl">{e['question']} </p>
+                    <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{e.answer}</ReactMarkdown>
+                  </>
+              )
+              }
+              {loading && <div className="flex items-center justify-center h-32">
+                <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-white"></div>
+              </div>}
+            </div>
+            <div className="flex items-center space-x-2 w-full mt-2 mx-2">
+              <button  onClick={()=>{questionList=[]; setQuestionList(questionList)}} className="p-2 bg-zinc-700 rounded-lg">
+                <ArrowPathIcon className="w-5 h-5" />
+              </button>
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={question}
+                onChange={(e)=>setQuestion(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent newline if textarea
+                    getAnswerFunc(question);
+                    setQuestion('');
+                  }
+                }}
+                className="flex-grow px-4 py-2 border border-neutral-800 rounded-lg focus:outline-none bg-zinc-700"
+              />
+              <button onClick={()=>{getAnswerFunc(question); setQuestion('')}} className="p-2 bg-zinc-700 rounded-lg">
+                <PaperAirplaneIcon className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 				</div>
 			</div>}
@@ -262,6 +264,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
                 type="number"
                 id="pageno_inp"
                 value={pageNumberDisp}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => setPageNumberDisp(Number(e.target.value))}
                 onBlur={() => setPageNumber(pageNumberDisp)}
                 className="appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none w-14 text-center bg-transparent focus:outline-none"
@@ -274,12 +277,15 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
           </div>
 
 				</div>
-				<div className="absolute bg-transparent mt-4 right-0 top-0 items-center h-full w-20 bg-gray-100 shadow-lg flex flex-col pl-4">
-					<button onClick={()=>{setShow(true)}} className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded">
+				<div className="fixed bg-transparent mt-10 right-0 top-0 items-center h-full w-20 bg-gray-100 shadow-lg flex flex-col pl-4">
+					<button onClick={()=>{setShow(true)}} className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
 						Q
 					</button>
-					<button onClick={()=>{setShow(true); getAnswerFunc('Explain'); }} className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded">
+					<button onClick={()=>{setShow(true); getAnswerFunc('Explain'); }} className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
 						EX
+					</button>
+					<button onClick={()=>{}} className="items-center justify-center bg-gray-500 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
+						+
 					</button>
 				</div>
 		</main>

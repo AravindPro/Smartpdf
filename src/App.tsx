@@ -31,7 +31,9 @@ function App() {
   let [paths, setPaths] = useState<Array<Path>>([]);
 
   const Viewer: React.FC<Viewer> = ({hasUploaded})=> <>
-    <button className="inline-block bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100" onClick={()=>hasUploaded(false)}>X</button>
+    <div className='dark:bg-zinc-800'>
+      <button className="inline-block bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100" onClick={()=>hasUploaded(false)}>&times;</button>
+    </div>
     <PdfBox pdfPath={pdfPath} />
   </>
   return (
