@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import axios from 'axios';
+import axios, { getAdapter } from 'axios';
 import { PDFDocumentProxy } from 'pdfjs-dist';
 // import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -12,7 +12,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
-import { MoonIcon, PaperAirplaneIcon,ArrowPathIcon } from '@heroicons/react/24/solid';
+import { MoonIcon, PaperAirplaneIcon,ArrowPathIcon, CheckIcon  } from '@heroicons/react/24/solid';
 
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 //     'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -37,12 +37,10 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   const [pageNumberDisp, setPageNumberDisp] = useState<number>(1);
   const [extraPages, setExtraPages] = useState<number>(5);
   const targetRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
-  let [compressionratio, setCompressionratio] = useState<Number>(2);
-  let [summary, setSummary] = useState<string>("");
   let [loading, setLoading] = useState(false);
-  let [show, setShow] = useState(false);
+  let [showquestions, setShowquestions] = useState(false);
+  let [showprompt, setShowprompt] = useState(false);
   // let [settings, setSettings] = useState<Boolean>(false);
-  let [styletokens,setStyleTokens] = useState("simple language");
   let [scale, setScale] = useState<number>(1);
   let [isSel, setIsSel] = useState<boolean>(false);
   let [selText, setSelectedText] = useState<string>('');
@@ -50,6 +48,10 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   const divRef = useRef(null);
 
   let [questionList, setQuestionList] = useState<{ question: string; answer: string }[]>([]);
+  let [promptlist, setPromptlist] = useState<{prompt: string, symbol: string}[]>([{prompt:"Summarize content and make it concise.", symbol:"SU"}, {prompt:"Explain in detail.", symbol:"EX"}]);
+
+  let [newprompt, setNewprompt] = useState<string>('');
+  let [newsymbol, setNewsymbol] = useState<string>('');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -60,7 +62,6 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
     if(selection && selection.length > 0){
       setIsSel(true);
       setSelectedText(selection);
-      console.log(selection);
     }
     else
       setIsSel(false);
@@ -123,10 +124,8 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 
   // Add swipe handlers
   const handlers = useSwipeable({
-    onSwipedLeft: nextPage,
-    onSwipedRight: prevPage,
-    onSwipedUp: () => console.log("Swiped up!"),
-    onSwipedDown: () => console.log("Swiped down!"),
+    onSwipedLeft: ()=>{if(!showprompt && !showquestions) nextPage()},
+    onSwipedRight: ()=>{if(!showprompt && !showquestions) prevPage()},
   });
 
 
@@ -151,7 +150,8 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
     questionList = [...questionList, {'question':String(question), 'answer':""}];
     setQuestionList(questionList);
 
-    axios.post(`${URLGPT}/query`, null, { params: {text: `${question}:\n${text}` }})
+    console.log(`Rewrite and return in markdown language with latex for equations. ${question}:\n ${text}`);
+    axios.post(`${URLGPT}/bookrewrite`, null, { params: {prompt: `Rewrite and return in markdown language with latex for equations. ${question}:`, text:text }})
       .then((res)=>res.data)
       .then((data)=>{
 
@@ -172,9 +172,11 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   }
 
   const getAnswerFunc = async (question: String) => {
+    console.log(question);
     let text: string = "";
     if(isSel){
       text = selText;
+      getAnswer(text, question);
     }
     else{
       const pdfDocument = pdfDocumentRef.current;
@@ -208,10 +210,10 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 
   return(
     <main ref={containerRef} className="relative overflow-hidden p-4 lg:p-16 xl:p-4 flex justify-center bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100">
-			{show && <div id="popup" className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
+			{showquestions && <div id="popup_questions" className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
         {/* Popup box */}
 				<div className="bg-zinc-600 rounded-2xl max-w-6xl shadow-xl p-6 w-[95%] h-[95%] text-center relative">
-					<button onClick={()=>{setShow(false)}} className="absolute top-0.5 right-1.5 w-4 h-4 text-gray-500 hover:text-red-500 text-xl font-bold">
+					<button onClick={()=>{setShowquestions(false)}} className="absolute top-0.5 right-1.5 w-4 h-4 text-gray-500 hover:text-gray-200 text-xl font-bold">
 						&times;
 					</button>
           <div className='flex flex-col h-[90vh]'>
@@ -252,6 +254,45 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
           </div>
 				</div>
 			</div>}
+      {showprompt && 
+      <div id="popup_prompt" className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-zinc-600 rounded-2xl max-w-6xl shadow-xl p-6 w-[95%] text-center relative inline-block">
+          <button onClick={()=>{setShowprompt(false)}} className="absolute top-0.5 right-1.5 w-4 h-4 text-gray-500 hover:text-gray-200 text-xl font-bold">
+            &times;
+          </button>
+          <input
+            type="text"
+            value={newprompt}
+            onChange={(e)=>setNewprompt(e.target.value)}
+            placeholder="Add new prompt"
+            className="w-full bg-transparent border-none outline-none text-slate-400 placeholder-slate-400/70 px-2 py-1 font-mono overflow-x-scroll"
+          />
+          <input
+            type="text"
+            placeholder="SYMBOL"
+            value={newsymbol}
+            maxLength={2}
+            onChange={(e)=>setNewsymbol(e.target.value.toUpperCase())}
+            className="w-full bg-transparent border-none outline-none text-slate-400 placeholder-slate-400/70 px-2 py-1 font-mono overflow-x-scroll"
+          />
+          <button className="bottom-2 h-6  bg-zinc-700 text-gray-100 text-xs py-1 px-1 flex items-center gap-1 shadow-sm"
+          onClick={()=>{
+            if(newsymbol!=='' && newprompt!==''){
+              promptlist = [...promptlist, {symbol:newsymbol, prompt:newprompt}];
+              setPromptlist(promptlist);
+              setNewprompt('');
+              setNewsymbol('');
+              setShowprompt(false);
+            }
+          }}
+          >
+            <CheckIcon className="h-4 text-gray-100" />
+            Add
+          </button>
+        </div>
+      </div>
+      }
+
 				<div {...handlers} className="max-w-4xl px-5 text-lg leading-relaxed text-justify">
           <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
             <div ref={divRef} style={{filter: `invert(${invert})`}}>
@@ -275,75 +316,23 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
               <MoonIcon className="w-5 h-5" />
             </button>
           </div>
-
 				</div>
+
 				<div className="fixed bg-transparent mt-10 right-0 top-0 items-center h-full w-20 bg-gray-100 shadow-lg flex flex-col pl-4">
-					<button onClick={()=>{setShow(true)}} className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
+          <button onClick={()=>setShowquestions(true)} className="items-center justify-center bg-gray-500 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
 						Q
 					</button>
-					<button onClick={()=>{setShow(true); getAnswerFunc('Explain'); }} className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
-						EX
+          {promptlist.map((item, index)=>
+					<button key={index} onClick={(e)=>{setShowquestions(true); getAnswerFunc(item['prompt'])}} className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
+						{item.symbol}
 					</button>
-					<button onClick={()=>{}} className="items-center justify-center bg-gray-500 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
+          )}
+					<button onClick={()=>setShowprompt(true)} className="items-center justify-center bg-gray-500 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded mb-4">
 						+
 					</button>
 				</div>
 		</main>
   );
-  // return (
-  //   <div id="pdfbox" className="relative overflow-hidden p-4 lg:p-16 xl:p-4 flex justify-center">
-  //     <main>
-  //       <div {...handlers} >
-  //         <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
-  //           <div ref={divRef} style={{filter: `invert(${invert})`}}>
-  //             <Page pageNumber={pageNumber} scale={scale} />
-  //           </div>
-  //           <p style={{margin: 0}}>
-  //             Page 
-  //             <input type="text" id="pageno_inp" value={pageNumberDisp} onChange={(e)=>setPageNumberDisp(Number(e.target.value))} onBlur={()=>setPageNumber(pageNumberDisp)} />
-  //             of {numPages}
-  //           </p>
-  //         </Document>
-  //       </div>
-
-  //       <div className="sliders">
-  //         <label className="itemslide">
-  //           Compression Ratio: 
-  //           <input type="range" min={1} max={10} step={0.1} value={String(compressionratio)} onChange={(e)=>{setCompressionratio(Number(e.target.value))}} /> 
-  //           <span className='range_disp'>{String(compressionratio)}</span>
-  //         </label>
-  //         <label className="itemslide">
-  //           Number of pages: 
-  //           <input type="range" min={1} max={10} value={String(extraPages)} onChange={(e)=>{setExtraPages(Number(e.target.value))}} /> 
-  //           <span className='range_disp'>{String(extraPages)}</span>
-  //         </label>
-  //         <label>
-  //           Style-Tokens:
-  //           <input type="text" value={styletokens} onChange={(e)=>setStyleTokens(e.target.value)}/>
-  //         </label>
-  //       </div>
-
-  //       <div ref={targetRef} className="summaryBox">
-  //         {loading && <div className="loading-overlay">
-  //           <div className="spinner"></div>
-  //         </div>}
-  //         <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{summary}</ReactMarkdown>
-  //       </div>
-  //     </main>
-      
-  //     <div className="absolute bg-transparent mt-4 right-0 top-0 items-center h-full w-20 bg-gray-100 shadow-lg flex flex-col pl-4">
-  //       <button className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded" onClick={()=>setScale(Math.max(scale-0.5, 1))}>-</button>
-  //       {/* <button onClick={()=>setSettings(!settings)}>Settings</button> */}
-  //       {/* <button onClick={prevPage}>Prev</button> */}
-  //       <button className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded" onClick={summarizeFunc}>{isSel?'Summary Selection':'Summary'}</button>
-  //       <button className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded" onClick={()=>setScale(Math.max(scale+0.5, 1))}>+</button>
-  //       <button className="items-center justify-center bg-zinc-700 hover:bg-blue-500 text-zinc-200 font-semibold hover:text-white h-10 w-10 rounded" onClick={()=>setInvert(invert?0:1)}>Invert</button>
-  //       {/* <button onClick={nextPage}>Next</button> */}
-  //       {/* <input type="text" value={String(extraPages)} onChange={(e)=>setExtraPages(Number(e.target.value))} />
-  //       <input type="text" value={String(compressionratio)} onChange={(e)=>setCompressionratio(Number(e.target.value))} /> */}
-  //     </div>      
-  //   </div>
-  // );
 }
 
 export default PdfBox;

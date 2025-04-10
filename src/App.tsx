@@ -18,10 +18,10 @@ import Upload from './Upload';
 interface Viewer{
   hasUploaded: React.Dispatch<React.SetStateAction<Boolean>>;
 };
-interface Path {
-  url: string;
-  name: string;
-};
+  interface Path {
+    url: string;
+    name: string;
+  };
 
 
 function App() {
