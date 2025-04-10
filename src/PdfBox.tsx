@@ -229,7 +229,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
                 <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-white"></div>
               </div>}
             </div>
-            <div className="flex items-center space-x-2 w-full mt-2 mx-2">
+            <div className="absolute bottom-4 flex items-center space-x-2 w-[95%] mt-2 mx-2">
               <button  onClick={()=>{questionList=[]; setQuestionList(questionList)}} className="p-2 bg-zinc-700 rounded-lg">
                 <ArrowPathIcon className="w-5 h-5" />
               </button>
