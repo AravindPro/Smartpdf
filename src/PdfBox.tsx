@@ -216,8 +216,8 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 					<button onClick={()=>{setShowquestions(false)}} className="absolute top-0.5 right-1.5 w-4 h-4 text-gray-500 hover:text-gray-200 text-xl font-bold">
 						&times;
 					</button>
-          <div className='flex flex-col h-[90vh]'>
-            <div className="flex-grow text-justify overflow-y-scroll p-4 h-full">
+          <div className='flex flex-col max-h-[95%] mb-4'>
+            <div className="flex-grow text-justify overflow-y-scroll p-4">
               {questionList.map((e)=>
                   <>
                     <p className="border-t border-b border-white p-4 text-2xl">{e['question']} </p>
