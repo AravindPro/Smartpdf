@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import axios, { getAdapter } from 'axios';
-import { PDFDocumentProxy } from 'pdfjs-dist';
+import { PDFDocumentProxy,PDFPageProxy } from 'pdfjs-dist';
 // import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -12,6 +12,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+
 import { MoonIcon, PaperAirplaneIcon,ArrowPathIcon, CheckIcon  } from '@heroicons/react/24/solid';
 
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -77,7 +78,27 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
   //     window.removeEventListener('onmouseup', handleSelection);
   //   };
   // }, []);
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+  const [pageSize, setPageSize] = useState({ width: 0, height: 0 });
 
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -139,7 +160,12 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
     },
     [] // No dependencies
   );
-
+  const handlePageLoadSuccess = (page: PDFPageProxy) => {
+    const viewport = page.getViewport({ scale: 1 });
+    const { width, height } = viewport;
+    setPageSize({ width, height });
+    console.log('PDF page dimensions:', width, height);
+  };
 
 
   // function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
@@ -212,7 +238,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
     <main ref={containerRef} className="relative overflow-hidden p-4 lg:p-16 xl:p-4 flex justify-center bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100">
 			{showquestions && <div id="popup_questions" className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50">
         {/* Popup box */}
-				<div className="bg-zinc-600 rounded-2xl max-w-6xl shadow-xl p-6 w-[95%] h-[95%] text-center relative">
+				<div className="bg-zinc-600 rounded-2xl max-w-6xl shadow-xl p-6 w-[95%] h-[95%] text-center relative flex-col">
 					<button onClick={()=>{setShowquestions(false)}} className="absolute top-0.5 right-1.5 w-4 h-4 text-gray-500 hover:text-gray-200 text-xl font-bold">
 						&times;
 					</button>
@@ -296,7 +322,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 				<div {...handlers} className="max-w-4xl px-5 text-lg leading-relaxed text-justify">
           <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
             <div ref={divRef} style={{filter: `invert(${invert})`}}>
-              <Page pageNumber={pageNumber} width={containerWidth - 126} />
+              <Page pageNumber={pageNumber} scale={Math.min(windowSize.height/pageSize.height, windowSize.width/pageSize.width)-0.05} onLoadSuccess={handlePageLoadSuccess} />
             </div>
           </Document>
           <div className="flex justify-center my-2">
