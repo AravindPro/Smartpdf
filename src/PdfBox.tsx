@@ -13,7 +13,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 
-import { MoonIcon, PaperAirplaneIcon,ArrowPathIcon, CheckIcon  } from '@heroicons/react/24/solid';
+import { MoonIcon, PaperAirplaneIcon,ArrowPathIcon, CheckIcon, MagnifyingGlassPlusIcon , MagnifyingGlassMinusIcon   } from '@heroicons/react/24/solid';
 
 // pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 //     'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -53,6 +53,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 
   let [newprompt, setNewprompt] = useState<string>('');
   let [newsymbol, setNewsymbol] = useState<string>('');
+  let [extra, setExtra]=useState<number>(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -165,6 +166,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
     const { width, height } = viewport;
     setPageSize({ width, height });
     console.log('PDF page dimensions:', width, height);
+    setScale(Math.min(windowSize.height/pageSize.height, windowSize.width/pageSize.width)-0.15+extra);
   };
 
 
@@ -322,7 +324,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
 				<div {...handlers} className="max-w-4xl px-5 text-lg leading-relaxed text-justify">
           <Document className="mainView" file={pdfPath} onLoadSuccess={onDocumentLoadSuccess} onMouseUp={handleSelection}>
             <div ref={divRef} style={{filter: `invert(${invert})`}}>
-              <Page pageNumber={pageNumber} scale={Math.min(windowSize.height/pageSize.height, windowSize.width/pageSize.width)-0.05} onLoadSuccess={handlePageLoadSuccess} />
+              <Page pageNumber={pageNumber} scale={scale} onLoadSuccess={handlePageLoadSuccess} />
             </div>
           </Document>
           <div className="flex justify-center my-2">
@@ -338,8 +340,14 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
               />
               <span className="text-gray-400">/ {numPages}</span>
             </div>
-            <button className="mx-10 p-2 rounded-xl bg-gray-300 text-gray-200 hover:bg-gray-700 hover:text-white transition duration-200 shadow-md" onClick={()=>setInvert(1-invert)}>
+            <button className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md" onClick={()=>setInvert(1-invert)}>
               <MoonIcon className="w-5 h-5" />
+            </button>
+            <button onClick={()=>{extra=extra+0.1; setExtra(extra); scale=scale+extra; setScale(scale);}} className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md">
+              <MagnifyingGlassPlusIcon className="w-5 h-5" />
+            </button>
+            <button onClick={()=>{extra=Math.max(extra-0.05, 0); setExtra(extra); setScale(scale+extra)}} className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md">
+              <MagnifyingGlassMinusIcon className="w-5 h-5" />
             </button>
           </div>
 				</div>
