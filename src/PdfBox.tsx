@@ -178,8 +178,8 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
     questionList = [...questionList, {'question':String(question), 'answer':""}];
     setQuestionList(questionList);
 
-    console.log(`Rewrite and return in markdown language with latex for equations. ${question}:\n ${text}`);
-    axios.post(`${URLGPT}/bookrewrite`, null, { params: {prompt: `Rewrite and return in markdown language with latex for equations. ${question}:`, text:text }})
+    // console.log(`Rewrite and return in markdown language with latex for equations. ${question}:\n ${text}`);
+    axios.post(`${URLGPT}/bookrewrite`, null, { params: {prompt: question, text:text }})
       .then((res)=>res.data)
       .then((data)=>{
 
