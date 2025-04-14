@@ -328,7 +328,7 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
             </div>
           </Document>
           <div className="flex justify-center my-2">
-            <div className="inline-flex items-center space-x-1 bg-gray-800 text-white text-xl px-3 py-1 rounded-full border border-gray-600">
+            <div className="inline-flex items-center space-x-1 bg-gray-800 text-white text-base px-3 py-1 rounded-full border border-gray-600">
               <input
                 type="number"
                 id="pageno_inp"
@@ -336,17 +336,17 @@ const PdfBox: React.FC<PdfBoxProps> = ({ pdfPath}) => {
                 onFocus={(e) => e.target.select()}
                 onChange={(e) => setPageNumberDisp(Number(e.target.value))}
                 onBlur={() => setPageNumber(pageNumberDisp)}
-                className="appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none w-14 text-center bg-transparent focus:outline-none"
+                className="min-w-10 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none text-center bg-transparent focus:outline-none"
               />
               <span className="text-gray-400">/ {numPages}</span>
             </div>
-            <button className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md" onClick={()=>setInvert(1-invert)}>
+            <button className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md" onClick={(e)=>{setInvert(1-invert); (e.target as HTMLElement).scrollIntoView()}}>
               <MoonIcon className="w-5 h-5" />
             </button>
-            <button onClick={()=>{extra=extra+0.1; setExtra(extra); scale=scale+extra; setScale(scale);}} className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md">
+            <button onClick={(e)=>{extra=extra+0.1; setExtra(extra); scale=scale+extra; setScale(scale); (e.target as HTMLElement).scrollIntoView()}} className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md">
               <MagnifyingGlassPlusIcon className="w-5 h-5" />
             </button>
-            <button onClick={()=>{extra=Math.max(extra-0.05, 0); setExtra(extra); setScale(scale+extra)}} className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md">
+            <button onClick={(e)=>{extra=Math.max(extra-0.05, 0); setExtra(extra); setScale(scale+extra); (e.target as HTMLElement).scrollIntoView()}} className="mx-10 p-2 rounded-xl hover:bg-gray-300 text-gray-200 bg-gray-700 hover:text-white transition duration-200 shadow-md">
               <MagnifyingGlassMinusIcon className="w-5 h-5" />
             </button>
           </div>
